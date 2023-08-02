@@ -123,8 +123,9 @@ class HBNBCommand(cmd.Cmd):
         if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        kwargs = {k: eval(v) for k, v in (item.split('=')\
-                                          for item in args_list if '=' in item)}
+        kwargs = {k: eval(v) for k, v in (item.split('=')
+                                          for item in args_list
+                                          if '=' in item)}
         for k, v in kwargs.items():
             if type(v) is str:
                 kwargs[k] = v.replace('_', ' ').replace('"', '\"')
@@ -329,6 +330,7 @@ class HBNBCommand(cmd.Cmd):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
