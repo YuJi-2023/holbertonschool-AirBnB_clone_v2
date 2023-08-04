@@ -3,6 +3,7 @@
 import os
 from models.base_model import Base
 from sqlalchemy import (create_engine)
+from sqlalchemy.orm import sessionmaker, scoped_session
 
 
 class DBStorage:
@@ -12,72 +13,51 @@ class DBStorage:
 
     def __init__(self):
         """create engine and connect to database"""
-        user = os.environ.get('HBNB_MYSQL_USER')
-        pwd = os.environ.get('HBNB_MYSQL_PWD')
-        host = os.environ.get('HBNB_MYSQL_HOST', 'localhost')
-        db = os.environ.get('HBNB_MYSQL_DB')
+        user = os.getenv('HBNB_MYSQL_USER')
+        pwd = os.getenv('HBNB_MYSQL_PWD')
+        host = os.getenv('HBNB_MYSQL_HOST', 'localhost')
+        db = os.getenv('HBNB_MYSQL_DB')
 
         self.__engine = create_engine('mysql+mysqldb://{}:{}@localhost/{}'.format(user, pwd, db), pool_pre_ping=True)
 
         env = os.environ.get('HBNB_ENV')
         if env == 'test':
             Base.metadata.drop_all(self.__engine)
-# good work girls
 
+# good work girls
     def all(self, cls=None):
         """Returns a dictionary of models currently in storage"""
         if cls is None:
-            return FileStorage.__objects
+            result = self.__session.query(User, State, City, Amenity, Place, Review).all()
         else:
-            temp_dict = {}
-            for key, value in FileStorage.__objects.items():
-                if value.__class__ is cls:
-                    temp_dict[key] = value
-            return temp_dict
+            result = self.__session.query(cls).all()
+        obj_dict = {}
+        for obj in result:
+            obj_dict[f"{cls}.{obj.id}"] = obj
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
-        self.all().update({obj.to_dict()['__class__'] + '.' + obj.id: obj})
+        self.__session.add(obj)
+        self.__session.commit()
 
     def save(self):
         """Saves storage dictionary to file"""
-        with open(FileStorage.__file_path, 'w') as f:
-            temp = {}
-            temp.update(FileStorage.__objects)
-            for key, val in temp.items():
-                temp[key] = val.to_dict()
-            json.dump(temp, f)
-
-    def reload(self):
-        """Loads storage dictionary from file"""
-        from models.base_model import BaseModel
-        from models.user import User
-        from models.place import Place
-        from models.state import State
-        from models.city import City
-        from models.amenity import Amenity
-        from models.review import Review
-
-        classes = {
-                    'BaseModel': BaseModel, 'User': User, 'Place': Place,
-                    'State': State, 'City': City, 'Amenity': Amenity,
-                    'Review': Review
-                  }
-        try:
-            temp = {}
-            with open(FileStorage.__file_path, 'r') as f:
-                temp = json.load(f)
-                for key, val in temp.items():
-                    self.all()[key] = classes[val['__class__']](**val)
-        except FileNotFoundError:
-            pass
+        self.__session.commit()
 
     def delete(self, obj=None):
-        """a public instance method to delete obj from __objects"""
-        if obj is None:
-            return
-        name = type(obj).__name__
-        obj_id = str(obj.id)
-        key = name + "." + obj_id
-        if key in self.__objects:
-            del self.__objects[key]
+        """a public instance method to delete obj from"""
+        if obj is not None:
+            self.__session.delete(obj)
+
+    def reload(self):
+        user = os.getenv('HBNB_MYSQL_USER')
+        pwd = os.getenv('HBNB_MYSQL_PWD')
+        host = os.getenv('HBNB_MYSQL_HOST', 'localhost')
+        db = os.getenv('HBNB_MYSQL_DB')
+
+        self.__engine = create_engine('mysql+mysqldb://{}:{}@localhost/{}'.format(user, pwd, db), pool_pre_ping=True)
+        Base.metadata.create_all(self.__engine)
+        SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.__engine, expire_on_commit=False)
+        self.__session = scoped_session(SessionLocal)
+
+# go Eva, you can do it
