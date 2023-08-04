@@ -30,7 +30,6 @@ class DBStorage:
         if env == 'test':
             Base.metadata.drop_all(self.__engine)
 
-# good work girls
     def all(self, cls=None):
         """Returns a dictionary of models currently in storage"""
         if cls is None:
@@ -38,14 +37,16 @@ class DBStorage:
         else:
             result = self.__session.query(cls).all()
         obj_dict = {}
+
         for obj in result:
-            obj_dict[f"{cls}.{obj.id}"] = obj
+            key = '{}.{}'.format(obj.__class__.__name__, obj.id)
+            obj_dict[key] = obj
+        
         return obj_dict
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
         self.__session.add(obj)
-        self.__session.commit()
 
     def save(self):
         """Saves storage dictionary to file"""
@@ -57,15 +58,6 @@ class DBStorage:
             self.__session.delete(obj)
 
     def reload(self):
-#        user = os.getenv('HBNB_MYSQL_USER')
-#        pwd = os.getenv('HBNB_MYSQL_PWD')
-#        host = os.getenv('HBNB_MYSQL_HOST', 'localhost')
-#        db = os.getenv('HBNB_MYSQL_DB')
-#
-#        self.__engine = create_engine('mysql+mysqldb://{}:{}@localhost/{}'.format(user, pwd, db), pool_pre_ping=True)
         Base.metadata.create_all(self.__engine)
         Session = sessionmaker(autocommit=False, autoflush=False, bind=self.__engine, expire_on_commit=False)
-#        self.__session = Session()
         self.__session = scoped_session(Session)
-
-# go Eva, you can do it
