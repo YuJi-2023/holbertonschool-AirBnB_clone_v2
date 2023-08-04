@@ -4,6 +4,12 @@ import os
 from models.base_model import Base
 from sqlalchemy import (create_engine)
 from sqlalchemy.orm import sessionmaker, scoped_session
+from models.user import User
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
 
 
 class DBStorage:
@@ -34,6 +40,7 @@ class DBStorage:
         obj_dict = {}
         for obj in result:
             obj_dict[f"{cls}.{obj.id}"] = obj
+        return obj_dict
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
@@ -50,14 +57,15 @@ class DBStorage:
             self.__session.delete(obj)
 
     def reload(self):
-        user = os.getenv('HBNB_MYSQL_USER')
-        pwd = os.getenv('HBNB_MYSQL_PWD')
-        host = os.getenv('HBNB_MYSQL_HOST', 'localhost')
-        db = os.getenv('HBNB_MYSQL_DB')
-
-        self.__engine = create_engine('mysql+mysqldb://{}:{}@localhost/{}'.format(user, pwd, db), pool_pre_ping=True)
+#        user = os.getenv('HBNB_MYSQL_USER')
+#        pwd = os.getenv('HBNB_MYSQL_PWD')
+#        host = os.getenv('HBNB_MYSQL_HOST', 'localhost')
+#        db = os.getenv('HBNB_MYSQL_DB')
+#
+#        self.__engine = create_engine('mysql+mysqldb://{}:{}@localhost/{}'.format(user, pwd, db), pool_pre_ping=True)
         Base.metadata.create_all(self.__engine)
-        SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.__engine, expire_on_commit=False)
-        self.__session = scoped_session(SessionLocal)
+        Session = sessionmaker(autocommit=False, autoflush=False, bind=self.__engine, expire_on_commit=False)
+#        self.__session = Session()
+        self.__session = scoped_session(Session)
 
 # go Eva, you can do it
