@@ -21,3 +21,16 @@ class Place(BaseModel, Base):
     amenity_ids = []
     user = relationship("User")
     cities = relationship("City")
+    reviews = relationship("Review", back_populates="place", cascade="all, delete, delete-orphan")
+
+    @property
+    def reviews(self):
+        """returns the list of Review instances"""
+        from models import Review, storage
+        review_list = []
+        review_dict = storage.all(Review)
+
+        for review_obj in review_dict.values():
+            if self.id == review_obj.place_id:
+                review_list.append(review_obj)
+        return review_list
