@@ -4,12 +4,6 @@ import os
 from models.base_model import Base
 from sqlalchemy import (create_engine)
 from sqlalchemy.orm import sessionmaker, scoped_session
-from models.user import User
-from models.state import State
-from models.city import City
-from models.amenity import Amenity
-from models.place import Place
-from models.review import Review
 
 
 class DBStorage:
@@ -24,7 +18,9 @@ class DBStorage:
         host = os.getenv('HBNB_MYSQL_HOST', 'localhost')
         db = os.getenv('HBNB_MYSQL_DB')
 
-        self.__engine = create_engine('mysql+mysqldb://{}:{}@localhost/{}'.format(user, pwd, db), pool_pre_ping=True)
+        self.__engine = create_engine('mysql+mysqldb://{}:{}@localhost/{}'\
+                                      .format(user, pwd, db),
+                                      pool_pre_ping=True)
 
         env = os.environ.get('HBNB_ENV')
         if env == 'test':
@@ -41,7 +37,7 @@ class DBStorage:
         for obj in result:
             key = '{}.{}'.format(obj.__class__.__name__, obj.id)
             obj_dict[key] = obj
-        
+
         return obj_dict
 
     def new(self, obj):
@@ -58,6 +54,16 @@ class DBStorage:
             self.__session.delete(obj)
 
     def reload(self):
+        """Loads storage from database"""
+        from models.user import User
+        from models.state import State
+        from models.city import City
+        from models.amenity import Amenity
+        from models.place import Place
+        from models.review import Review
         Base.metadata.create_all(self.__engine)
-        Session = sessionmaker(autocommit=False, autoflush=False, bind=self.__engine, expire_on_commit=False)
+        Session = sessionmaker(autocommit=False,
+                               autoflush=False,
+                               bind=self.__engine,
+                               expire_on_commit=False)
         self.__session = scoped_session(Session)
