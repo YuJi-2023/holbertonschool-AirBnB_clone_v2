@@ -3,7 +3,7 @@
 from models.base_model import BaseModel, Base
 from sqlalchemy import Table, Column, String, Integer, Float, ForeignKey
 from sqlalchemy.orm import relationship
-import os
+from os import getenv
 
 """creating relationship table"""
 place_amenity = Table('place_amenity', Base.metadata,
@@ -32,13 +32,15 @@ class Place(BaseModel, Base):
     price_by_night = Column(Integer, default=0, nullable=False)
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
+    
     amenity_ids = []
     user = relationship("User")
     cities = relationship("City")
     reviews = relationship("Review",
                            back_populates="place",
                            cascade="all, delete, delete-orphan")
-    if os.getenv('HBNB_TYPE_STORAGE') == 'db':
+    
+    if getenv('HBNB_TYPE_STORAGE') == 'db':
         amenities = relationship("Amenity",
                                  secondary="place_amenity",
                                  back_populates="places", #not in task, chatty suggest
@@ -48,7 +50,7 @@ class Place(BaseModel, Base):
         @property
         def amenities(self):
             """returns the list of Amenity instances"""
-            from models import Amenity, storage
+            from models import storage
             amenities_obj_list = []
             amenities_obj_dict = storage.all(Amenity)
 
@@ -60,13 +62,14 @@ class Place(BaseModel, Base):
         @amenities.setter
         def amenities(self, value):
             """handles append method for adding an Amenity.id"""
-            from models import Amenity, storage
+           # from models import Amenity, storage
             if type(value) is Amenity:
                 self.amenity_ids.append(value.id)
+
     @property
     def reviews(self):
         """returns the list of Review instances"""
-        from models import Review, storage
+        from models import storage
         review_list = []
         review_dict = storage.all(Review)
 
