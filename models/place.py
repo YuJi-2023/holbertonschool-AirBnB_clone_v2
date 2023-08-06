@@ -33,9 +33,18 @@ class Place(BaseModel, Base):
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
     
-#    amenity_ids = []
-
     if getenv('HBNB_TYPE_STORAGE') != 'db':
+        @property
+        def reviews(self):
+            """returns the list of Review instances"""
+            from models import storage
+            review_list = []
+            review_dict = storage.all(Review)
+
+            for review_obj in review_dict.values():
+                if self.id == review_obj.place_id:
+                    review_list.append(review_obj)
+            return review_list
 
         @property
         def amenities(self):
@@ -53,27 +62,14 @@ class Place(BaseModel, Base):
         def amenities(self, value):
             """handles append method for adding an Amenity.id"""
            # from models import Amenity, storage
-            if type(value) is Amenity:
+            if type(value) == Amenity:
                 self.amenity_ids.append(value.id)
 
-        @property
-        def reviews(self):
-            """returns the list of Review instances"""
-            from models import storage
-            review_list = []
-            review_dict = storage.all(Review)
-
-            for review_obj in review_dict.values():
-                if self.id == review_obj.place_id:
-                    review_list.append(review_obj)
-            return review_list
-    else:
-        user = relationship("User")
-        cities = relationship("City")
+        user = relationship("User", back_populates="places")
+        cities = relationship("City", back_populates="places")
         reviews = relationship("Review",
                                back_populates="place",
                                cascade="all, delete, delete-orphan")
         amenities = relationship("Amenity",
                                 secondary="place_amenity",
-                                back_populates="places",
                                 viewonly=False)
