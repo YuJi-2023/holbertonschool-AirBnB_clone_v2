@@ -21,7 +21,7 @@ def hbnb_route():
 def c_route(text):
     """c variable route"""
     new_text = text.replace("_", " ")
-    return f"C {escape(text)}"
+    return f"C {escape(new_text)}"
 
 
 if __name__ == "__main__":
