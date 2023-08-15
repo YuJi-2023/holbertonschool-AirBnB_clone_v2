@@ -16,17 +16,17 @@ class State(BaseModel, Base):
                               cascade="all, delete, delete-orphan")
 
     #if getenv("HBNB_TYPE_STORAGE") != "db":
-        @property
-        def cities(self):
-            """returns the list of City instances"""
-            from models import storage
-            city_list = []
-            city_dict = storage.all(City)
+    @property
+    def cities(self):
+        """returns the list of City instances"""
+        from models import storage
+        city_list = []
+        city_dict = storage.all(City)
 
-            for city_obj in city_dict.values():
-                if self.id == city_obj.state_id:
-                    city_list.append(city_obj)
-            return city_list
+        for city_obj in city_dict.values():
+            if self.id == city_obj.state_id:
+                city_list.append(city_obj)
+        return city_list
     #else:
      #   cities = relationship("City",
       #                        back_populates="state",
