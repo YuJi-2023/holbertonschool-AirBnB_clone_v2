@@ -74,7 +74,7 @@ class Place(BaseModel, Base):
                 cascade="all, delete, delete-orphan")
 
         user = relationship("User", back_populates="places")
-        cities = relationship("City", back_populates="places")
+        city = relationship("City", back_populates="places")
 
         amenities = relationship(
                 "Amenity", secondary="place_amenity", viewonly=False)

@@ -13,6 +13,6 @@ class City(BaseModel, Base):
     state_id = Column(String(60), ForeignKey("states.id"), nullable=False)
     if getenv("HBNB_TYPE_STORAGE") == "db":
         places = relationship("Place",
-                              back_populates="cities",
+                              back_populates="city",
                               cascade="all, delete, delete-orphan")
-        state = relationship("State", back_populates="cities") #not in requirements
+        state = relationship("State", back_populates="cities")
