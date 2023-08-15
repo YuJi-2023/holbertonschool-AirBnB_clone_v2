@@ -18,7 +18,7 @@ class DBStorage:
         host = os.getenv('HBNB_MYSQL_HOST', 'localhost')
         db = os.getenv('HBNB_MYSQL_DB')
 
-        self.__engine = create_engine('mysql+mysqldb://{}:{}@localhost/{}'\
+        self.__engine = create_engine('mysql+mysqldb://{}:{}@localhost/{}'
                                       .format(user, pwd, db),
                                       pool_pre_ping=True)
 
@@ -29,7 +29,8 @@ class DBStorage:
     def all(self, cls=None):
         """Returns a dictionary of models currently in storage"""
         if cls is None:
-            result = self.__session.query(User, State, City, Amenity, Place, Review).all()
+            result = self.__session.query(User, State, City,
+                                          Amenity, Place, Review).all()
         else:
             result = self.__session.query(cls).all()
         obj_dict = {}
