@@ -6,14 +6,13 @@ from models import storage
 app = Flask(__name__)
 
 
-@app.route("/states_list/", strict_slashes=False)
+@app.route("/states_list", strict_slashes=False)
 def states_list():
     """display html page state list"""
-    state_dict = storage.all("State")
-    state_list = []
-    for state in state_dict.values():
-        state_list.append(state)
-    return render_template("7-states_list.html", state_list=state_list)
+    states = storage.all("State")
+    #for state in states.values():
+     #   state_list.append(state)
+    return render_template("7-states_list.html", states=states)
 
 
 @app.teardown_appcontext
