@@ -11,9 +11,10 @@ app = Flask(__name__)
 def states_list():
     """display html page state list"""
     states = storage.all(State)
-    #for state in states.values():
-    #    state_list.append(state)
-    return render_template("7-states_list.html", states=states)
+    state_list = []
+    for state in states.values():
+        state_list.append(state)
+    return render_template("7-states_list.html", state_list=state_list)
 
 
 @app.teardown_appcontext
