@@ -28,7 +28,3 @@ class State(BaseModel, Base):
                 if self.id == city_obj.state_id:
                     city_list.append(city_obj)
             return city_list
-    else:
-        cities = relationship("City",
-                            back_populates="state",
-                            cascade="all, delete, delete-orphan")
