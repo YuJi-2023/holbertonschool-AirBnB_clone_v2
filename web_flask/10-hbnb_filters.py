@@ -5,13 +5,19 @@ from markupsafe import escape
 from models import storage
 from models.state import State
 from models.city import City
+from models.amenity import Amenity
 app = Flask(__name__)
 
 
 @app.route("/hbnb_filters", strict_slashes=False)
-def states():
+def filters():
     """display a filter html page"""
-    return render_template("10-hbnb_filters.html")
+    state_list = storage.all(State)
+    city_list = storage.all(City)
+    amenity_list = storage.all(Amenity)
+
+    return render_template("10-hbnb_filters.html", city_list=city_list,
+                           state_list=state_list, amenity_list=amenity_list)
 
 
 @app.teardown_appcontext
