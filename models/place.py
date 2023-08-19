@@ -5,7 +5,7 @@ from sqlalchemy import Column, String, Integer, Float, ForeignKey, Table
 from sqlalchemy.orm import relationship
 from os import getenv
 
-"""Build a many to many relationship between place and amenity"""
+"""Build a many to many relationship between place and amenity
 place_amenity = Table(
     "place_amenity",
     Base.metadata,
@@ -20,14 +20,13 @@ place_amenity = Table(
         String(60),
         ForeignKey("amenities.id"),
         primary_key=True, nullable=False)
-)
+)"""
 
 
 class Place(BaseModel, Base):
     """ A place to stay """
     __tablename__ = 'places'
 
-   # city_id = Column(String(60), ForeignKey('cities.id'), nullable=False)
     user_id = Column(String(60), ForeignKey('users.id'), nullable=False)
     name = Column(String(128), nullable=False)
     description = Column(String(1024), nullable=True)
@@ -50,23 +49,6 @@ class Place(BaseModel, Base):
                     review_list[key] = val
             return review_list
 
-        @property
-        def amenities(self):
-            """Return the list of Amenity instances"""
-            from models import storage
-            amenity_values_list = storage.all(Amenity).values()
-            amenity_list = []
-            for amenity in amenity_values_list:
-                if amenity.id in self.amenity_ids:
-                    amenity_list.append(amenity)
-            return amenity_list
-
-        @amenities.setter
-        def amenities(self, value):
-            """handles append method for adding an Amenity.id to amenity_ids"""
-            if type(value) == Amenity:
-                self.amenity_ids.append(value.id)
-
     else:
         reviews = relationship(
                 "Review",
@@ -74,7 +56,3 @@ class Place(BaseModel, Base):
                 cascade="all, delete, delete-orphan")
 
         user = relationship("User", back_populates="places")
-    #    city = relationship("City", back_populates="places")
-
-        amenities = relationship(
-                "Amenity", secondary="place_amenity", viewonly=False)
